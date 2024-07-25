@@ -16,5 +16,5 @@ libc = "0.2.155"
 nix = { version = "0.29.0", features = ["fs", "process", "signal"] }
 rustix = { version = "0.38.34", features = ["pipe", "process"] }
 squashfs-ng = "0.1.3"
-squashfuse-rs = "0.1.0"
+squashfuse-rs = { git = "https://github.com/linux-packaging-rs/squashfuse-rs", branch = "main" }
 tempfile = "3.10.1"
