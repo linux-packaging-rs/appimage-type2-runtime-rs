@@ -1,0 +1,20 @@
+[package]
+name = "type2-runtime"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = [ "Ryan Brue <ryanbrue@gmail.com>" ]
+repository = "https://github.com/ryanabx/appimage-rs"
+readme = "README.md"
+description = "An AppImage Type-2 runtime implementation written in Rust"
+
+[dependencies]
+anyhow = "1.0.86"
+fuser = "0.14.0"
+goblin = { version = "0.8.2", features = ["std", "elf32", "elf64"] }
+libc = "0.2.155"
+nix = { version = "0.29.0", features = ["fs", "process", "signal"] }
+rustix = { version = "0.38.34", features = ["pipe", "process"] }
+squashfs-ng = "0.1.3"
+squashfuse-rs = "0.1.0"
+tempfile = "3.10.1"
