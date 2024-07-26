@@ -5,6 +5,7 @@ use std::{
     env,
     ffi::{CString, OsStr},
     fs::{self, File},
+    io::BufReader,
     os::fd::AsRawFd,
     path::Path,
     thread::{self},
@@ -77,22 +78,20 @@ fn portable_option(appimage_path: &Path, arg1: &OsStr, name: &str) -> anyhow::Re
     }
 }
 
-fn fusefs_main(offset: u64, mountpoint: &Path, appimage_path: &Path) -> anyhow::Result<()> {
-    let fs = match squashfs_ng::read::Archive::open(appimage_path) {
-        Ok(reader) => squashfuse_rs::SquashfsFilesystem::new(reader),
-        Err(err) => {
-            return Err(anyhow::anyhow!("Failed to open SquashFS image: {}", err));
-        }
-    };
+// fuser::MountOption::CUSTOM(format!("offset={offset}")),
 
+fn fusefs_main(offset: u64, mountpoint: &Path, archive_path: &Path) -> anyhow::Result<()> {
+    let reader = BufReader::new(File::open(&archive_path)?);
+    let fs = squashfuse_rs::SquashfsFilesystem::new(
+        backhand::FilesystemReader::from_reader_with_offset(reader, offset)?,
+    );
     let mount_options = vec![
         fuser::MountOption::FSName("squashfuse".to_string()),
         fuser::MountOption::RO,
-        fuser::MountOption::CUSTOM(format!("offset={offset}")),
     ];
     match fuser::mount2(fs, mountpoint, &mount_options) {
         Ok(()) => {
-            println!("Mounted {:?} at {:?}", appimage_path, mountpoint);
+            println!("Mounted {:?} at {:?}", archive_path, mountpoint);
             Ok(())
         }
         Err(err) => Err(anyhow::anyhow!("Failed to mount: {}", err)),
